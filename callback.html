@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="./public/strava-favicon.svg" />
+    <title>Freshfeel Strava - Authorization Complete</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f9f1f1;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .message {
+            color: #1a1a1a;
+            margin: 1rem 0;
+        }
+        .home-link {
+            color: #fc4c02;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Authorization Complete</h1>
+        <p class="message">Successfully connected to Strava!</p>
+        <a href="./" class="home-link">Return to Dashboard</a>
+    </div>
+    <script>
+        // Get the authorization code from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        
+        if (code) {
+            // Store the code temporarily (you might want to send this to your backend)
+            localStorage.setItem('strava_auth_code', code);
+            console.log('Authorization code received:', code);
+        }
+    </script>
+</body>
+</html> 
