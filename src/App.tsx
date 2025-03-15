@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { FriendCard } from './components/FriendCard';
 import { MilestoneProgress } from './components/MilestoneProgress';
 import { friends, milestone } from './stravaData';
