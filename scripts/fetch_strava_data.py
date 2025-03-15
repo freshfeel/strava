@@ -23,7 +23,8 @@ class StravaDataFetcher:
             for pair in token_pairs:
                 if ':' in pair:
                     athlete_id, token = pair.strip().split(':')
-                    tokens[athlete_id] = token
+                    # Store athlete_id as integer
+                    tokens[int(athlete_id)] = token
         return tokens
     
     def _refresh_access_token(self, refresh_token):
@@ -45,7 +46,9 @@ class StravaDataFetcher:
     def get_athlete_activities(self, athlete_id, after_date):
         """Get activities for a specific athlete after a given date."""
         print(f"\nFetching activities for athlete {athlete_id}")
-        refresh_token = self.athlete_tokens.get(str(athlete_id))
+        # Convert athlete_id to int for dictionary lookup
+        athlete_id = int(athlete_id)
+        refresh_token = self.athlete_tokens.get(athlete_id)
         if not refresh_token:
             raise ValueError(f"No refresh token found for athlete {athlete_id}")
         
@@ -68,7 +71,9 @@ class StravaDataFetcher:
     
     def get_athlete_profile(self, athlete_id):
         """Get athlete's profile data using their refresh token."""
-        refresh_token = self.athlete_tokens.get(str(athlete_id))
+        # Convert athlete_id to int for dictionary lookup
+        athlete_id = int(athlete_id)
+        refresh_token = self.athlete_tokens.get(athlete_id)
         if not refresh_token:
             return {
                 'name': f"Athlete {athlete_id}",
@@ -106,14 +111,15 @@ class StravaDataFetcher:
                     if activity['type'] in ['Run', 'VirtualRun']
                 )
                 
-                athlete_distances[athlete_id] = {
+                # Store with integer athlete_id
+                athlete_distances[int(athlete_id)] = {
                     'distance': round(total_distance, 2),
                     'name': profile['name'],
                     'avatar': profile['avatar']
                 }
             except Exception as e:
                 print(f"Error fetching data for athlete {athlete_id}: {str(e)}")
-                athlete_distances[athlete_id] = {
+                athlete_distances[int(athlete_id)] = {
                     'distance': 0,
                     'name': f"Athlete {athlete_id}",
                     'avatar': "https://i.pravatar.cc/150?img=1",

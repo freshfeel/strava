@@ -30,7 +30,7 @@ def update_strava_data():
     friends_data = []
     for athlete_id, data in weekly_distances.items():
         friends_data.append({
-            'id': int(athlete_id),
+            'id': athlete_id,  # athlete_id is already an integer
             'name': data['name'],
             'avatar': data['avatar'],
             'distanceThisWeek': data['distance']
