@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect with Strava</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .strava-button {
+            background-color: #fc4c02;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 600;
+            margin-top: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+        .strava-button:hover {
+            background-color: #e34402;
+        }
+        .strava-logo {
+            height: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Connect Your Strava Account</h1>
+        <p>Click the button below to authorize access to your Strava data.</p>
+        <a id="strava-auth" class="strava-button" href="#">
+            <img class="strava-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Strava_logo_2019.svg/512px-Strava_logo_2019.svg.png" alt="Strava logo">
+            Connect with Strava
+        </a>
+    </div>
+    <script>
+        const clientId = '151040';
+        const redirectUri = window.location.origin + '/callback.html';
+        const scope = 'read,activity:read_all';
+        
+        const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+        document.getElementById('strava-auth').href = authUrl;
+    </script>
+</body>
+</html> 
