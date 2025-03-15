@@ -16,6 +16,15 @@
             margin: 0;
             background-color: #f9f1f1;
         }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
+        }
         .strava-button {
             display: inline-block;
             background: #fc4c02;
@@ -34,24 +43,130 @@
             vertical-align: middle;
             margin-right: 8px;
         }
+        .token-display {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            word-break: break-all;
+            text-align: left;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .home-link {
+            color: #fc4c02;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+        .athlete-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .athlete-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .athlete-details {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
-    <a href="#" id="connect-button" class="strava-button">
-        <img src="strava-logo.svg" alt="Strava logo" class="strava-logo">
-        Connect with Strava
-    </a>
+    <div class="container">
+        <div id="auth-section" style="display: none;">
+            <h1>Connect Your Strava Account</h1>
+            <a href="#" id="connect-button" class="strava-button">
+                <img src="strava-logo.svg" alt="Strava logo" class="strava-logo">
+                Connect with Strava
+            </a>
+        </div>
+        <div id="callback-section" style="display: none;">
+            <h1>Authorization Complete</h1>
+            <div id="athlete-info" class="athlete-info">
+                Loading athlete information...
+            </div>
+            <div class="token-display" id="tokenInfo">Loading...</div>
+            <p>Please copy both the Refresh Token and Athlete ID and send them to the app administrator.</p>
+            <a href="https://freshfeel.github.io/strava/" class="home-link">Return to Dashboard</a>
+        </div>
+    </div>
 
     <script>
         const clientId = '112348';
-        const redirectUri = encodeURIComponent('https://freshfeel.github.io/strava/callback.html');
+        const redirectUri = encodeURIComponent('https://freshfeel.github.io/strava/auth.html');
         const scope = 'read,activity:read_all,profile:read_all';
 
-        document.getElementById('connect-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
-            window.location.href = authUrl;
-        });
+        // Check if we're in callback mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        
+        if (code) {
+            // Show callback section
+            document.getElementById('callback-section').style.display = 'block';
+            
+            // Make request to Strava token endpoint
+            fetch('https://www.strava.com/oauth/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    client_id: '112348',
+                    client_secret: '01234e62083234d0b234d8d49d7c49e9c2345678',
+                    code: code,
+                    grant_type: 'authorization_code'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Full Strava response:', data);
+                
+                // Display athlete information
+                const athleteInfo = document.getElementById('athlete-info');
+                if (data.athlete) {
+                    athleteInfo.innerHTML = `
+                        <img src="${data.athlete.profile}" alt="Profile" class="athlete-avatar">
+                        <div class="athlete-details">
+                            <h2>${data.athlete.firstname} ${data.athlete.lastname}</h2>
+                            <p>@${data.athlete.username}</p>
+                        </div>
+                    `;
+                }
+
+                // Display token information
+                const tokenInfo = document.getElementById('tokenInfo');
+                tokenInfo.innerHTML = `<strong>Athlete ID:</strong> ${data.athlete.id}\n\n` +
+                                    `<strong>Refresh Token:</strong>\n${data.refresh_token}\n\n` +
+                                    `<strong>Access Token:</strong>\n${data.access_token}\n\n` +
+                                    `<strong>Token Type:</strong> ${data.token_type}\n` +
+                                    `<strong>Expires At:</strong> ${new Date(data.expires_at * 1000).toLocaleString()}`;
+            })
+            .catch(error => {
+                document.getElementById('tokenInfo').textContent = 'Error getting token: ' + error.message;
+                console.error('Error details:', error);
+            });
+        } else {
+            // Show auth section
+            document.getElementById('auth-section').style.display = 'block';
+            
+            // Set up click handler for the auth button
+            document.getElementById('connect-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+                window.location.href = authUrl;
+            });
+        }
     </script>
 </body>
 </html> 
