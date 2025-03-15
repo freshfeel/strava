@@ -80,18 +80,44 @@ class StravaDataFetcher:
                 'avatar': "https://i.pravatar.cc/150?img=1"
             }
         
-        access_token = self._refresh_access_token(refresh_token)
-        
-        response = requests.get(
-            f"{self.BASE_URL}/athlete",
-            headers={'Authorization': f'Bearer {access_token}'}
-        )
-        
-        athlete_data = response.json()
-        return {
-            'name': f"{athlete_data['firstname']} {athlete_data['lastname']}",
-            'avatar': athlete_data.get('profile', "https://i.pravatar.cc/150?img=1")
-        }
+        try:
+            access_token = self._refresh_access_token(refresh_token)
+            
+            response = requests.get(
+                f"{self.BASE_URL}/athlete",
+                headers={'Authorization': f'Bearer {access_token}'}
+            )
+            
+            athlete_data = response.json()
+            print(f"Athlete data received: {json.dumps(athlete_data, indent=2)}")
+            
+            # Check if we got an error response
+            if 'errors' in athlete_data:
+                print(f"Error in athlete data: {athlete_data['errors']}")
+                return {
+                    'name': f"Athlete {athlete_id}",
+                    'avatar': "https://i.pravatar.cc/150?img=1"
+                }
+            
+            # Handle case where firstname/lastname might be missing
+            firstname = athlete_data.get('firstname', '')
+            lastname = athlete_data.get('lastname', '')
+            if not firstname and not lastname:
+                name = f"Athlete {athlete_id}"
+            else:
+                name = f"{firstname} {lastname}".strip()
+            
+            return {
+                'name': name,
+                'avatar': athlete_data.get('profile', "https://i.pravatar.cc/150?img=1")
+            }
+            
+        except Exception as e:
+            print(f"Error getting profile for athlete {athlete_id}: {str(e)}")
+            return {
+                'name': f"Athlete {athlete_id}",
+                'avatar': "https://i.pravatar.cc/150?img=1"
+            }
     
     def get_weekly_running_distances(self, athlete_ids):
         """Get the running distances for the past week for multiple athletes."""
