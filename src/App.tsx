@@ -14,7 +14,7 @@ function App() {
             Track your friends' activities and reach milestones together
           </p>
           <a
-            href="/auth.html"
+            href="/strava/auth.html"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark transition-colors duration-150 ease-in-out"
           >
             Connect with Strava
