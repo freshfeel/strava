@@ -10,8 +10,17 @@ def update_strava_data():
     # Initialize the data fetcher
     fetcher = StravaDataFetcher()
     
+    # Get athlete IDs from environment variable
+    athlete_ids_str = os.getenv('STRAVA_ATHLETE_IDS', '')
+    athlete_ids = [int(id.strip()) for id in athlete_ids_str.split(',')] if athlete_ids_str else []
+    
+    if not athlete_ids:
+        print("No athlete IDs found in STRAVA_ATHLETE_IDS environment variable")
+        return
+        
+    print(f"Processing athletes: {athlete_ids}")
+    
     # Get weekly distances for all athletes
-    athlete_ids = [144790047]  # Add more athlete IDs here if needed
     weekly_distances = fetcher.get_weekly_running_distances(athlete_ids)
     
     # Calculate total distance for milestone

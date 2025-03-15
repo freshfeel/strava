@@ -14,13 +14,16 @@ class StravaDataFetcher:
     
     def _get_athlete_tokens(self):
         """Get athlete tokens from environment variables.
-        Format: STRAVA_ATHLETE_<ID>_TOKEN=<refresh_token>
+        Format: STRAVA_ATHLETE_TOKENS=id1:token1,id2:token2,...
         """
         tokens = {}
-        for key, value in os.environ.items():
-            if key.startswith('STRAVA_ATHLETE_') and key.endswith('_TOKEN'):
-                athlete_id = key.split('_')[2]
-                tokens[athlete_id] = value
+        tokens_str = os.getenv('STRAVA_ATHLETE_TOKENS', '')
+        if tokens_str:
+            token_pairs = tokens_str.split(',')
+            for pair in token_pairs:
+                if ':' in pair:
+                    athlete_id, token = pair.strip().split(':')
+                    tokens[athlete_id] = token
         return tokens
     
     def _refresh_access_token(self, refresh_token):
