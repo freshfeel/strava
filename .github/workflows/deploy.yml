@@ -1,0 +1,80 @@
+name: Deploy to GitHub Pages and Update Data
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+  workflow_dispatch:  # Allow manual trigger
+
+# Add permissions for the GITHUB_TOKEN
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install Python dependencies
+        run: |
+          cd scripts
+          pip install -r requirements.txt
+          
+      - name: Update Strava data
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_ATHLETE_TOKEN: ${{ secrets.STRAVA_ATHLETE_TOKEN }}
+        run: |
+          cd scripts
+          python update_strava_data.py
+          
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'freshfeel'
+          git config --global user.email 'damidoppler@gmail.com'
+          git add -A
+          git commit -m "Update Strava data" || exit 0
+          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/freshfeel/strava.git
+
+  deploy:
+    needs: update-data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Create .env file
+        run: |
+          echo "VITE_STRAVA_CLIENT_ID=${{ secrets.STRAVA_CLIENT_ID }}" > .env
+        
+      - name: Build
+        run: npm run build
+        env:
+          VITE_STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+        
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist 
