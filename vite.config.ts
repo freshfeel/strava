@@ -10,8 +10,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        auth: 'public/auth.html',
-        callback: 'public/callback.html'
+        auth: 'auth.html',
+        callback: 'callback.html'
       }
     }
   },
