@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="./public/strava-favicon.svg" />
-    <title>Freshfeel Strava - Authorization Complete</title>
+    <link rel="icon" type="image/svg+xml" href="strava-favicon.svg" />
+    <title>Strava Authorization Complete</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -22,15 +22,24 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
         }
-        .message {
-            color: #1a1a1a;
+        .token-display {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
             margin: 1rem 0;
+            word-break: break-all;
+            text-align: left;
+            font-family: monospace;
         }
         .home-link {
             color: #fc4c02;
             text-decoration: none;
             font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
         }
         .home-link:hover {
             text-decoration: underline;
@@ -40,18 +49,42 @@
 <body>
     <div class="container">
         <h1>Authorization Complete</h1>
-        <p class="message">Successfully connected to Strava!</p>
-        <a href="./" class="home-link">Return to Dashboard</a>
+        <div class="token-display" id="tokenInfo">Loading...</div>
+        <p>Please copy both the Refresh Token and Athlete ID and send them to the app administrator.</p>
+        <a href="https://eldopp.github.io/strava/" class="home-link">Return to Dashboard</a>
     </div>
+
     <script>
         // Get the authorization code from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         
         if (code) {
-            // Store the code temporarily (you might want to send this to your backend)
-            localStorage.setItem('strava_auth_code', code);
-            console.log('Authorization code received:', code);
+            // Make request to Strava token endpoint
+            fetch('https://www.strava.com/oauth/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    client_id: '112348',
+                    client_secret: '01234e62083234d0b234d8d49d7c49e9c2345678',
+                    code: code,
+                    grant_type: 'authorization_code'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display both the refresh token and athlete ID
+                const tokenInfo = document.getElementById('tokenInfo');
+                tokenInfo.innerHTML = `<strong>Athlete ID:</strong> ${data.athlete.id}<br><br>` +
+                                    `<strong>Refresh Token:</strong><br>${data.refresh_token}`;
+            })
+            .catch(error => {
+                document.getElementById('tokenInfo').textContent = 'Error getting token: ' + error.message;
+            });
+        } else {
+            document.getElementById('tokenInfo').textContent = 'No authorization code found in URL';
         }
     </script>
 </body>

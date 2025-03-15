@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="./public/strava-favicon.svg" />
-    <title>Freshfeel Strava - Authorization</title>
+    <link rel="icon" type="image/svg+xml" href="strava-favicon.svg" />
+    <title>Connect with Strava</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -16,55 +16,41 @@
             margin: 0;
             background-color: #f9f1f1;
         }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
         .strava-button {
-            background-color: #fc4c02;
+            display: inline-block;
+            background: #fc4c02;
             color: white;
             padding: 12px 24px;
             border-radius: 4px;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
             font-weight: 600;
-            margin-top: 1rem;
-            border: none;
-            cursor: pointer;
+            transition: background-color 0.2s;
         }
         .strava-button:hover {
-            background-color: #e34402;
+            background: #e34402;
         }
         .strava-logo {
             height: 24px;
+            vertical-align: middle;
             margin-right: 8px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Connect Your Strava Account</h1>
-        <p>Click the button below to authorize access to your Strava data.</p>
-        <a id="strava-auth" class="strava-button" href="#">
-            <img class="strava-logo" src="./public/strava-logo.svg" alt="Strava logo">
-            Connect with Strava
-        </a>
-    </div>
+    <a href="#" id="connect-button" class="strava-button">
+        <img src="strava-logo.svg" alt="Strava logo" class="strava-logo">
+        Connect with Strava
+    </a>
+
     <script>
-        // Client ID should be set as an environment variable during build
-        const clientId = '151040'; // Using the client ID directly since it's public anyway
-        const redirectUri = 'https://freshfeel.github.io/strava/callback.html';
+        const clientId = '112348';
+        const redirectUri = 'https://eldopp.github.io/strava/callback.html';
         const scope = 'read,activity:read';
-        
-        // Set up click handler for the auth button
-        document.getElementById('strava-auth').addEventListener('click', function(e) {
+
+        document.getElementById('connect-button').addEventListener('click', function(e) {
             e.preventDefault();
-            // Redirect to Strava authorization page
-            window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+            const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+            window.location.href = authUrl;
         });
     </script>
 </body>
