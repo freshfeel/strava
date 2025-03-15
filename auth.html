@@ -44,7 +44,7 @@
 
     <script>
         const clientId = '112348';
-        const redirectUri = 'https://freshfeel.github.io/strava/callback.html';
+        const redirectUri = encodeURIComponent('https://freshfeel.github.io/strava/callback.html');
         const scope = 'read,activity:read_all,profile:read_all';
 
         document.getElementById('connect-button').addEventListener('click', function(e) {
